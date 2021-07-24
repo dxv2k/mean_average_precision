@@ -40,6 +40,7 @@ class MeanAveragePrecision2d(MetricBase):
         """Reset stored data."""
         self._init()
 
+    # TODO: modified this 
     def add(self, preds, gt):
         """ Add sample to evaluation.
 

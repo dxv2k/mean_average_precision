@@ -83,6 +83,7 @@ def compute_average_precision_with_recall_thresholds(precision, recall, recall_t
         average_precision = average_precision + p / recall_thresholds.size
     return average_precision
 
+# TODO: modified this 
 def compute_iou(pred, gt):
     """ Calculates IoU (Jaccard index) of two sets of bboxes:
             IOU = pred ∩ gt / (area(pred) + area(gt) - pred ∩ gt)
@@ -101,6 +102,7 @@ def compute_iou(pred, gt):
     _gt = np.tile(gt, (pred.shape[0], 1))
     _pred = np.repeat(pred, gt.shape[0], axis=0)
 
+    # Convert from xmin,ymin -> QUAD [x1,y1],[x2,y2],[x3,y3],[x4,y4]
     ixmin = np.maximum(_gt[:, 0], _pred[:, 0])
     iymin = np.maximum(_gt[:, 1], _pred[:, 1])
     ixmax = np.minimum(_gt[:, 2], _pred[:, 2])
@@ -114,6 +116,7 @@ def compute_iou(pred, gt):
     iou = (intersection_area / union_area).reshape(pred.shape[0], gt.shape[0])
     return iou
 
+# TODO: modified this 
 def compute_match_table(preds, gt, img_id):
     """ Compute match table.
 
