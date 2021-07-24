@@ -58,6 +58,8 @@ class MeanAveragePrecision2d(MetricBase):
         # assert preds.ndim == 8 and preds.shape[1] == 8
         # assert gt.ndim == 8 and gt.shape[1] == 8
 
+        # TODO: modified this to QUAD format 
+        # TODO: Add pred_c dummy & gt_c dummy to original bbox (preds,gt) 
         class_counter = np.zeros((1, self.num_classes), dtype=np.int32)
         for c in range(self.num_classes):
             gt_c = gt[gt[:, 4] == c]

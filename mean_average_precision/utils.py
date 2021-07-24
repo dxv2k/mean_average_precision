@@ -25,12 +25,14 @@ SOFTWARE.
 import numpy as np
 import pandas as pd
 import shapely
-from shapely.geometry import Polygon,MultiPoint  #Polygon
+from shapely.geometry import Polygon, MultiPoint  # Polygon
+
 
 def sort_by_col(array, idx=1):
     """Sort np.array by column."""
     order = np.argsort(array[:, idx])[::-1]
     return array[order]
+
 
 def compute_precision_recall(tp, fp, n_positives):
     """ Compute Preision/Recall.
@@ -50,6 +52,7 @@ def compute_precision_recall(tp, fp, n_positives):
     precision = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
     return precision, recall
 
+
 def compute_average_precision(precision, recall):
     """ Compute Avearage Precision by all points.
 
@@ -65,8 +68,10 @@ def compute_average_precision(precision, recall):
     for i in range(precision.size - 1, 0, -1):
         precision[i - 1] = np.maximum(precision[i - 1], precision[i])
     ids = np.where(recall[1:] != recall[:-1])[0]
-    average_precision = np.sum((recall[ids + 1] - recall[ids]) * precision[ids + 1])
+    average_precision = np.sum(
+        (recall[ids + 1] - recall[ids]) * precision[ids + 1])
     return average_precision
+
 
 def compute_average_precision_with_recall_thresholds(precision, recall, recall_thresholds):
     """ Compute Avearage Precision by specific points.
@@ -85,8 +90,21 @@ def compute_average_precision_with_recall_thresholds(precision, recall, recall_t
         average_precision = average_precision + p / recall_thresholds.size
     return average_precision
 
-# TODO: modified this 
-def compute_iou(pred, gt):
+# TODO: modified this
+
+
+def compute_iou(preds, gt):
+    # iou = np.array([])
+    iou = []
+    for idx_gt in range(gt.shape[0]):
+        for idx_pred in range(preds.shape[0]):
+            temp_iou = np.array([calculate_iou(gt[idx_gt], preds[idx_pred])])
+            iou.append(temp_iou)
+            # print(temp_iou)
+            # np.concatenate(iou,temp_iou)
+    iou = np.array(iou).reshape(preds.shape[0], gt.shape[0])
+    print(iou)
+    return iou
     """ Calculates IoU (Jaccard index) of two sets of bboxes:
             IOU = pred ∩ gt / (area(pred) + area(gt) - pred ∩ gt)
 
@@ -118,30 +136,39 @@ def compute_iou(pred, gt):
     # iou = (intersection_area / union_area).reshape(pred.shape[0], gt.shape[0])
     
     # Reshape & Convert to Polygon
-    _gt = np.array(gt).reshape(4,2)
-    _pred = np.array(pred).reshape(4,2)
+    # iou = np.array([]) 
 
-    _poly_gt = Polygon(_gt).convex_hull
-    _poly_pred = Polygon(_pred).convex_hull
 
-    # Calc IOU   
-    union_poly = np.concatenate((_poly_gt,_poly_pred))
-    if not _poly_pred.intersects(_poly_gt): 
-        iou = 0 
-    else: 
-        try: 
-            inter_area = _poly_pred.intersection(_poly_gt)
-            print("Inter area",inter_area)
+def calculate_iou(pred, gt):
+    _pred = np.array(pred).reshape(4, 2)
+    pred_poly = Polygon(_pred).convex_hull
+    # print(Polygon(_pred).convex_hull)  # you can print to see if this is the case
+
+    _gt = np.array(gt).reshape(4, 2)
+    gt_poly = Polygon(_gt).convex_hull
+    # print(Polygon(_gt).convex_hull)
+
+    # Merge two box coordinates to become 8*2
+    union_poly = np.concatenate((_pred, _gt))
+    # print(MultiPoint(union_poly).convex_hull)
+    # If the two quadrilaterals do not intersect
+    if not pred_poly.intersects(gt_poly):
+        iou = 0
+    else:
+        try:
+            inter_area = pred_poly.intersection(
+                gt_poly).area  # intersection area
+        #     print(inter_area)
             union_area = MultiPoint(union_poly).convex_hull.area
-            print("Union area",union_area)
-            if union_area == 0: 
-                iou = 0 
+        #     print(union_area)
+            if union_area == 0:
+                iou = 0
             iou = float(inter_area)/union_area
-
         except shapely.geos.TopologicalError:
             print('shapely.geos.TopologicalError occured, iou set to 0')
             iou = 0
     return iou
+
 
 
 # TODO: modified this 
@@ -175,8 +202,11 @@ def compute_match_table(preds, gt, img_id):
     match_table["confidence"] = preds[:, 5].tolist()
     if gt.shape[0] > 0:
         match_table["iou"] = compute_iou(preds, gt).tolist()
-        match_table["difficult"] = _tile(gt[:, 5], preds.shape[0], axis=0)
-        match_table["crowd"] = _tile(gt[:, 6], preds.shape[0], axis=0)
+        # match_table["difficult"] = _tile(gt[:, 5], preds.shape[0], axis=0)
+        # match_table["crowd"] = _tile(gt[:, 6], preds.shape[0], axis=0)
+        match_table["difficult"] = _empty_array_2d(preds.shape[0])
+        match_table["crowd"] = _empty_array_2d(preds.shape[0])
+
     else:
         match_table["iou"] = _empty_array_2d(preds.shape[0])
         match_table["difficult"] = _empty_array_2d(preds.shape[0])
