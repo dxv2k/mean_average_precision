@@ -4,7 +4,8 @@ from shapely.geometry import Polygon, MultiPoint  # Polygon
 
 # One-dimensional array representation of the coordinates of the four points of the quadrilateral, [x,y,x,y....]
 # line1 = [2, 0, 2, 2, 0, 0, 0, 0]
-line1 = [1, 1, 4, 1, 4, 4, 1, 4]
+line1 = [196, 194, 287, 201, 289, 267, 196, 263]
+
 # quadrilateral two-dimensional coordinate representation
 a = np.array(line1).reshape(4, 2)
 # python quadrilateral object, will automatically calculate four points, the last four points in the order of: top left bottom right bottom right top left top
@@ -12,7 +13,8 @@ poly1 = Polygon(a).convex_hull
 print(Polygon(a).convex_hull)  # you can print to see if this is the case
 
 
-line2 = [1, 1, 4, 1, 4, 4, 1, 4]
+# line2 = [1, 1, 4, 1, 4, 4, 1, 4]
+line2 = [199, 194, 287, 201, 289, 267, 196, 263]
 b = np.array(line2).reshape(4, 2)
 poly2 = Polygon(b).convex_hull
 print(Polygon(b).convex_hull)

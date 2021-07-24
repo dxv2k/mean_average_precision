@@ -117,10 +117,30 @@ def compute_iou(pred, gt):
     # union_area = get_box_area(_gt) + get_box_area(_pred) - intersection_area
     # iou = (intersection_area / union_area).reshape(pred.shape[0], gt.shape[0])
     
-    # Reshape from line -> Polygon 
+    # Reshape & Convert to Polygon
+    _gt = np.array(gt).reshape(4,2)
+    _pred = np.array(pred).reshape(4,2)
 
-    # Calc IOU 
+    _poly_gt = Polygon(_gt).convex_hull
+    _poly_pred = Polygon(_pred).convex_hull
 
+    # Calc IOU   
+    union_poly = np.concatenate((_poly_gt,_poly_pred))
+    if not _poly_pred.intersects(_poly_gt): 
+        iou = 0 
+    else: 
+        try: 
+            inter_area = _poly_pred.intersection(_poly_gt)
+            print("Inter area",inter_area)
+            union_area = MultiPoint(union_poly).convex_hull.area
+            print("Union area",union_area)
+            if union_area == 0: 
+                iou = 0 
+            iou = float(inter_area)/union_area
+
+        except shapely.geos.TopologicalError:
+            print('shapely.geos.TopologicalError occured, iou set to 0')
+            iou = 0
     return iou
 
 
