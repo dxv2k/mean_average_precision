@@ -13,7 +13,10 @@ class MetricBuilder:
         return list(metrics_dict.keys())
 
     @staticmethod
-    def build_evaluation_metric(metric_type, async_mode=False, adapter_type=AdapterDefault, *args, **kwargs):
+    def build_evaluation_metric(metric_type, 
+                            async_mode=False, 
+                            adapter_type=AdapterDefault, 
+                            *args, **kwargs):
         """ Build evaluation metric.
 
         Arguments:

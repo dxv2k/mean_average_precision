@@ -49,16 +49,15 @@ class MeanAveragePrecision2d(MetricBase):
             gt (np.array): ground truth boxes.
 
         Input format:
-            preds: [xmin, ymin, xmax, ymax, class_id, confidence]
-            gt: [xmin, ymin, xmax, ymax, class_id, difficult, crowd]
-
             preds: [x1, y1, x2, y2, x3, y3, x4, y4]
             gt: [x1, y1, x2, y2, x3, y3, x4, y4]
 
 
         """
+        # TODO: not sure what to set here 
         # assert preds.ndim == 8 and preds.shape[1] == 8
-        # assert gt.ndim == 2 and gt.shape[1] == 7
+        # assert gt.ndim == 8 and gt.shape[1] == 8
+
         class_counter = np.zeros((1, self.num_classes), dtype=np.int32)
         for c in range(self.num_classes):
             gt_c = gt[gt[:, 4] == c]

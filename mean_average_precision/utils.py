@@ -24,6 +24,8 @@ SOFTWARE.
 
 import numpy as np
 import pandas as pd
+import shapely
+from shapely.geometry import Polygon,MultiPoint  #Polygon
 
 def sort_by_col(array, idx=1):
     """Sort np.array by column."""
@@ -96,25 +98,31 @@ def compute_iou(pred, gt):
         Return value:
             iou (np.array): intersection over union
     """
-    def get_box_area(box):
-        return (box[:, 2] - box[:, 0] + 1.) * (box[:, 3] - box[:, 1] + 1.)
+    # def get_box_area(box):
+    #     return (box[:, 2] - box[:, 0] + 1.) * (box[:, 3] - box[:, 1] + 1.)
 
-    _gt = np.tile(gt, (pred.shape[0], 1))
-    _pred = np.repeat(pred, gt.shape[0], axis=0)
+    # _gt = np.tile(gt, (pred.shape[0], 1))
+    # _pred = np.repeat(pred, gt.shape[0], axis=0)
 
-    # Convert from xmin,ymin -> QUAD [x1,y1],[x2,y2],[x3,y3],[x4,y4]
-    ixmin = np.maximum(_gt[:, 0], _pred[:, 0])
-    iymin = np.maximum(_gt[:, 1], _pred[:, 1])
-    ixmax = np.minimum(_gt[:, 2], _pred[:, 2])
-    iymax = np.minimum(_gt[:, 3], _pred[:, 3])
+    # # Convert from xmin,ymin -> QUAD [x1,y1],[x2,y2],[x3,y3],[x4,y4]
+    # ixmin = np.maximum(_gt[:, 0], _pred[:, 0])
+    # iymin = np.maximum(_gt[:, 1], _pred[:, 1])
+    # ixmax = np.minimum(_gt[:, 2], _pred[:, 2])
+    # iymax = np.minimum(_gt[:, 3], _pred[:, 3])
 
-    width = np.maximum(ixmax - ixmin + 1., 0)
-    height = np.maximum(iymax - iymin + 1., 0)
+    # width = np.maximum(ixmax - ixmin + 1., 0)
+    # height = np.maximum(iymax - iymin + 1., 0)
 
-    intersection_area = width * height
-    union_area = get_box_area(_gt) + get_box_area(_pred) - intersection_area
-    iou = (intersection_area / union_area).reshape(pred.shape[0], gt.shape[0])
+    # intersection_area = width * height
+    # union_area = get_box_area(_gt) + get_box_area(_pred) - intersection_area
+    # iou = (intersection_area / union_area).reshape(pred.shape[0], gt.shape[0])
+    
+    # Reshape from line -> Polygon 
+
+    # Calc IOU 
+
     return iou
+
 
 # TODO: modified this 
 def compute_match_table(preds, gt, img_id):

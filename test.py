@@ -1,6 +1,7 @@
+from mean_average_precision import metric_base
 import numpy as np
 import mean_average_precision
-# from mean_average_precision import metric_builder
+from mean_average_precision import MetricBuilder
 
 if __name__ == "__main__":
     # QUAD format [x1,y1,x2,y2,x3,y3,x4,y4] 
@@ -22,3 +23,13 @@ if __name__ == "__main__":
    ])
 
     print(MetricBuilder.get_metrics_list())
+
+    # Create metric_fn 
+    metric_fn = MetricBuilder.build_evaluation_metric("map_2d",
+                                                num_classes=1)
+
+    for i in range(10): 
+        metric_fn.add(pred,gt)
+        # print(metric_fn.value)
+
+    print(f"COCO mAP: {metric_fn.value(iou_thresholds=np.arange(0.5, 1.0, 0.05), recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy='soft')['mAP']}")
